@@ -1,5 +1,5 @@
 import {client} from './db.js'
-import { enqueueJob, getNextJob, markCompleted } from './jobs.js'
+import { enqueueJob, getNextJob, markCompleted, markFailed, markRunning } from './jobs.js'
 
 
 const createTable = `
@@ -23,8 +23,12 @@ async function main() {
         userMail: 'ij@gmail.com'
     }
     await client.connect()
+    await client.query('BEGIN;')
     const res = await getNextJob('EMAIL')
-    console.log(res)
+    const runn = await markRunning(res.id)
+    const comp = await markCompleted(runn.id)
+    console.log(comp)
+    await client.query('COMMIT;')
     await client.end()
 }
 
