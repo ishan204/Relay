@@ -24,10 +24,13 @@ async function main() {
     }
     await client.connect()
     await client.query('BEGIN;')
-    const res = await getNextJob('EMAIL')
-    const runn = await markRunning(res.id)
-    const comp = await markCompleted(runn.id)
-    console.log(comp)
+    for(let i = 1; i <= 10; i++) {
+    await enqueueJob(
+        "test",
+        { number: i },
+        "email"
+    );
+    }
     await client.query('COMMIT;')
     await client.end()
 }
