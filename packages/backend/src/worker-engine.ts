@@ -16,12 +16,7 @@ export async function startWorker(namespace: string){
             console.log(
     `[WORKER] Processing job ${job.id}`
 );
-            if(job.id % 2 == 0){
-                await testHandler(job.payload)
-            }else{
-                await testFailureHandler(job.payload)
-            }
-            await markCompleted(job.id)
+            await testHandler(job.payload)
             console.log(
     `[WORKER] Completed job ${job.id}`
 );

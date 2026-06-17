@@ -1,5 +1,5 @@
 import {client} from './db.ts'
-import { JobStatus } from '../types.ts'
+import { JobStatus } from '../../shared/src/types.ts'
 export async function enqueueJob(type: string, payload: unknown, namespace:string) {
     const status = JobStatus.PENDING
     const qry  = 'INSERT INTO JOBS(type, status, payload, namespace) VALUES ($1, $2, $3, $4) RETURNING *'

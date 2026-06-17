@@ -1,0 +1,31 @@
+{
+  "name": "relay",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "worker": "tsx src/worker.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ishan204/Relay.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ishan204/Relay/issues"
+  },
+  "homepage": "https://github.com/ishan204/Relay#readme",
+  "dependencies": {
+    "pg": "^8.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "@types/pg": "^8.20.0",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}

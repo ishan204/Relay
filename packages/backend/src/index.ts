@@ -1,5 +1,5 @@
-import {client} from './db.js'
-import { enqueueJob, getNextJob, markCompleted, markFailed, markRunning } from './jobs.js'
+import {client} from './db.ts'
+import { enqueueJob, getNextJob, markCompleted, markFailed, markRunning } from './jobs.ts'
 
 
 const createTable = `
