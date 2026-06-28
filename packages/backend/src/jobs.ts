@@ -1,5 +1,6 @@
 import {client} from './db.ts'
 import { JobStatus } from '../../shared/src/types.ts'
+import type { Request, Response } from 'express'
 export async function enqueueJob(type: string, payload: unknown, namespace:string) {
     const status = JobStatus.PENDING
     const qry  = 'INSERT INTO JOBS(type, status, payload, namespace) VALUES ($1, $2, $3, $4) RETURNING *'
@@ -13,6 +14,17 @@ export async function getNextJob(namespace: string) {
     const qry = `SELECT * FROM jobs WHERE status=($1) and namespace=($2) and next_run_at <= NOW() order by priority desc, created_at asc limit 1 FOR UPDATE SKIP LOCKED;`
     const res = await client.query(qry, [status,namespace])
     return res.rows[0] ?? null
+}
+
+export async function getAllJobs(req: Request, res:Response){
+    try{
+        const qry = 'SELECT * FROM jobs;'
+        const result = await client.query(qry)
+        return res.json(result.rows)
+    }catch(err){
+         console.error(err);
+        res.status(500).json({ error: "Failed to fetch jobs" });
+    }
 }
 
 export async function markCompleted(id: number){

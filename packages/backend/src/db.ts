@@ -7,3 +7,8 @@ export const client = new Client({
   password: "postgres",
   database: "relay",
 });
+
+export async function connectDb(){
+  await client.connect()
+  console.log("Successfully Connected to Postgres")
+}

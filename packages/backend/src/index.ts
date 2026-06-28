@@ -1,5 +1,5 @@
 import {client} from './db.ts'
-import { enqueueJob, getNextJob, markCompleted, markFailed, markRunning } from './jobs.ts'
+import { enqueueJob, getAllJobs, getNextJob, markCompleted, markFailed, markRunning } from './jobs.ts'
 
 
 const createTable = `
@@ -23,15 +23,6 @@ async function main() {
         userMail: 'ij@gmail.com'
     }
     await client.connect()
-    await client.query('BEGIN;')
-    for(let i = 1; i <= 10; i++) {
-    await enqueueJob(
-        "test",
-        { number: i },
-        "email"
-    );
-    }
-    await client.query('COMMIT;')
     await client.end()
 }
 
