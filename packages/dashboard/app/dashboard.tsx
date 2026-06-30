@@ -9,7 +9,16 @@ import { mockJobs, generateMockJobs } from './data/mockJobs';
 
 export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>(mockJobs);
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  useEffect(() => {
+    async function main() {
+      const res = await fetch("http://localhost:8080/jobs")
+      const data = await res.json()
+      console.log(data)
+      setJobs(data)
+    }
+    main()
+  }, [])
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
   const [wsState, setWsState] = useState<WebSocketState>({ connected: true });
   const [activeWorkers, setActiveWorkers] = useState(0);
@@ -18,11 +27,11 @@ export default function Dashboard() {
 
   const calculateMetrics = useCallback((): Metrics => {
     return {
-      pending: jobs.filter((j) => j.status === 'pending').length,
-      processing: jobs.filter((j) => j.status === 'processing').length,
-      completed: jobs.filter((j) => j.status === 'completed').length,
-      failed: jobs.filter((j) => j.status === 'failed').length,
-      deadLetter: jobs.filter((j) => j.status === 'deadLetter').length,
+      pending: jobs.filter((j) => j.status === 'PENDING').length,
+      processing: jobs.filter((j) => j.status === 'RUNNING').length,
+      completed: jobs.filter((j) => j.status === 'COMPLETED').length,
+      failed: jobs.filter((j) => j.status === 'FAILED').length,
+      deadLetter: jobs.filter((j) => j.status === 'DEAD').length,
     };
   }, [jobs]);
 
@@ -30,13 +39,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     setMetrics(calculateMetrics());
-    setActiveWorkers(jobs.filter((j) => j.status === 'processing').length);
+    setActiveWorkers(jobs.filter((j) => j.status === 'RUNNING').length);
   }, [jobs, calculateMetrics]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setMetrics(calculateMetrics());
-      setActiveWorkers(jobs.filter((j) => j.status === 'processing').length);
+      setActiveWorkers(jobs.filter((j) => j.status === 'RUNNING').length);
     }, 1000);
     return () => clearInterval(interval);
   }, [jobs, calculateMetrics]);
@@ -51,8 +60,10 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
+  // Logic
+  /*
   useEffect(() => {
-    const statuses: Job['status'][] = ['pending', 'processing', 'completed', 'failed'];
+    const status: Job['status'][] = ['pending', 'processing', 'completed', 'failed'];
     const maxJobsPerStatus = { pending: 8, processing: 6, completed: 50, failed: 10, deadLetter: 10 };
 
     const interval = setInterval(() => {
@@ -127,7 +138,7 @@ export default function Dashboard() {
 
     return () => clearInterval(interval);
   }, []);
-
+*/
   useEffect(() => {
     if (selectedJobId) {
       const jobStillExists = jobs.some((j) => j.id === selectedJobId);

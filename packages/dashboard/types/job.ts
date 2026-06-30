@@ -1,4 +1,4 @@
-export type JobStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'deadLetter';
+import {JobStatus} from '../../shared/src/types'
 export type JobPriority = 'critical' | 'high' | 'normal' | 'low';
 
 export interface RetryAttempt {
@@ -10,16 +10,20 @@ export interface RetryAttempt {
 }
 
 export interface Job {
-  id: string;
-  description: string;
+  id: number;
   status: JobStatus;
-  priority: JobPriority;
-  createdAt: string;
-  updatedAt: string;
-  workerId?: string;
-  attemptCount: number;
-  maxAttempts: number;
   payload: Record<string, unknown>;
+  priority: JobPriority;
+  attempts: number;
+  maxAttempts: number;
+  next_run_at: Date;
+  created_at: string;
+  namespace: string;
+  type: string;
+  updatedAt: Date;
+  started_at: Date;
+  completed_at: Date;
+  workerId?: string;
   retryHistory: RetryAttempt[];
   aiOutput?: string;
 }

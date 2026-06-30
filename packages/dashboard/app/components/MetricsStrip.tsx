@@ -42,8 +42,8 @@ export function MetricsStrip({ metrics }: MetricsStripProps) {
           label="Processing"
           value={metrics.processing}
           icon={<Loader2 className="w-5 h-5 animate-spin" />}
-          colorClass="text-processing"
-          bgClass="bg-processing/10"
+          colorClass="text-running"
+          bgClass="bg-running/10"
         />
         <MetricCard
           label="Completed"

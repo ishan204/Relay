@@ -9,9 +9,11 @@
   --color-borderLight: #3A3A48;
 
   --color-pending: #4A6FA5;
-  --color-processing: #C8A84B;
+  --color-running: #C8A84B;
   --color-completed: #3D9A6F;
+  --color-completedLight: #5dfc77;
   --color-failed: #C25B5B;
+  --color-flight: #FAAFAF;
   --color-deadLetter: #8B5CF6;
 
   --color-textPrimary: #F5F5F7;
@@ -45,4 +47,28 @@
       opacity: 0.85;
     }
   }
+}
+
+.scrollable{
+  overflow-y: auto;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+  background-clip: content-box;
 }

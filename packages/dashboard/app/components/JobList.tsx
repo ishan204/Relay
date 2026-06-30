@@ -1,27 +1,28 @@
-import { Job, TabFilter, JobStatus } from '@/types/job';
+import { Job, TabFilter } from '@/types/job';
+import {JobStatus} from '../../../shared/src/types'
 
 interface JobListProps {
   jobs: Job[];
-  selectedJobId: string | null;
+  selectedJobId: number | null;
   onSelectJob: (job: Job) => void;
   activeTab: TabFilter;
   onTabChange: (tab: TabFilter) => void;
 }
 
 const statusColors: Record<JobStatus, string> = {
-  pending: 'border-l-pending',
-  processing: 'border-l-processing',
-  completed: 'border-l-completed',
-  failed: 'border-l-failed',
-  deadLetter: 'border-l-deadLetter',
+  PENDING: 'border-l-pending',
+  RUNNING: 'border-l-running',
+  COMPLETED: 'border-l-completed',
+  FAILED: 'border-l-failed',
+  DEAD: 'border-l-deadLetter',
 };
 
 const statusBadgeClasses: Record<JobStatus, string> = {
-  pending: 'status-badge status-badge-pending',
-  processing: 'status-badge status-badge-processing',
-  completed: 'status-badge status-badge-completed',
-  failed: 'status-badge status-badge-failed',
-  deadLetter: 'status-badge status-badge-deadLetter',
+  PENDING: 'status-badge status-badge-pending text-pending text-sm',
+  RUNNING: 'status-badge status-badge-processing text-running text-sm',
+  COMPLETED: 'status-badge status-badge-completed border-completed w-20 text-completedLight rounded-xl border-1 p-1 font-normal text-xs',
+  FAILED: 'status-badge status-badge-failed border-failed border-1 w-20 text-center p-1 rounded-xl text-flight text-xs font-medium',
+  DEAD: 'status-badge status-badge-deadLetter text-deadLetter text-sm',
 };
 
 const priorityBadgeClasses: Record<string, string> = {
@@ -33,9 +34,9 @@ const priorityBadgeClasses: Record<string, string> = {
 
 const tabs: { id: TabFilter; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'processing', label: 'Processing' },
-  { id: 'failed', label: 'Failed' },
-  { id: 'deadLetter', label: 'Dead Letter' },
+  { id: JobStatus.RUNNING, label: 'Processing' },
+  { id: JobStatus.FAILED, label: 'Failed' },
+  { id: JobStatus.DEAD, label: 'Dead Letter' },
 ];
 
 function formatTimestamp(isoString: string): string {
@@ -69,7 +70,7 @@ export function JobList({ jobs, selectedJobId, onSelectJob, activeTab, onTabChan
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 scrollable overflow-auto">
         {filteredJobs.map((job) => (
           <div
             key={job.id}
@@ -80,13 +81,13 @@ export function JobList({ jobs, selectedJobId, onSelectJob, activeTab, onTabChan
           >
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <span className="font-mono text-sm text-textPrimary shrink-0">{job.id}</span>
-                <span className="text-sm text-textSecondary truncate">{job.description}</span>
+                <span className="font-mono text-sm text-textPrimary shrink-0">job-{job.id}</span>
+                <span className="text-sm text-textSecondary truncate">payload</span>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className={priorityBadgeClasses[job.priority]}>{job.priority}</span>
+                <span className={priorityBadgeClasses['low']}>{job.priority}</span>
                 <span className="font-mono text-xs text-textMuted w-20 text-right">
-                  {formatTimestamp(job.updatedAt)}
+                  {new Date(job.created_at).toLocaleTimeString()}
                 </span>
                 <span className={statusBadgeClasses[job.status]}>{job.status}</span>
               </div>
