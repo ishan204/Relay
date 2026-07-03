@@ -18,18 +18,34 @@ const statusColors: Record<JobStatus, string> = {
 };
 
 const statusBadgeClasses: Record<JobStatus, string> = {
-  PENDING: 'status-badge status-badge-pending text-pending text-sm',
-  RUNNING: 'status-badge status-badge-processing text-running text-sm',
-  COMPLETED: 'status-badge status-badge-completed border-completed w-20 text-completedLight rounded-xl border-1 p-1 font-normal text-xs',
-  FAILED: 'status-badge status-badge-failed border-failed border-1 w-20 text-center p-1 rounded-xl text-flight text-xs font-medium',
-  DEAD: 'status-badge status-badge-deadLetter text-deadLetter text-sm',
+  PENDING:
+    'bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-medium w-24 py-1 rounded-xl text-center',
+
+  RUNNING:
+    'bg-sky-500/10 border border-sky-500/40 text-sky-300 text-xs font-medium w-24 py-1 rounded-xl text-center',
+
+  COMPLETED:
+    'bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 text-xs font-medium w-24 py-1 rounded-xl text-center',
+
+  FAILED:
+    'bg-rose-500/10 border border-rose-500/40 text-rose-300 text-xs font-medium w-24 py-1 rounded-xl text-center',
+
+  DEAD:
+    'bg-slate-500/10 border border-slate-500/40 text-slate-300 text-xs font-medium w-24 py-1 rounded-xl text-center',
 };
 
 const priorityBadgeClasses: Record<string, string> = {
-  critical: 'status-badge priority-badge-critical',
-  high: 'status-badge priority-badge-high',
-  normal: 'status-badge priority-badge-normal',
-  low: 'status-badge priority-badge-low',
+  critical:
+    'bg-red-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg shadow-red-600/30',
+
+  medium:
+    'bg-violet-900 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md shadow-violet-500/20',
+
+  high:
+    'bg-yellow-500 text-black text-xs font-semibold px-3 py-1 rounded-full shadow-md shadow-yellow-500/20',
+
+  low:
+    'bg-sky-900 text-white text-xs font-semibold px-3 py-1 rounded-full',
 };
 
 const tabs: { id: TabFilter; label: string }[] = [
@@ -47,6 +63,21 @@ function formatTimestamp(isoString: string): string {
     second: '2-digit',
     hour12: false,
   });
+}
+
+function convertPriority(priority: number){
+  switch(priority){
+     case 0:
+        return "low"
+     case 1:
+      return "medium"
+    case 2:
+      return "high"
+    case 3: 
+      return "critical"
+    default:
+      return "low"
+  }
 }
 
 export function JobList({ jobs, selectedJobId, onSelectJob, activeTab, onTabChange }: JobListProps) {
@@ -85,7 +116,7 @@ export function JobList({ jobs, selectedJobId, onSelectJob, activeTab, onTabChan
                 <span className="text-sm text-textSecondary truncate">payload</span>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className={priorityBadgeClasses['low']}>{job.priority}</span>
+                <span className={priorityBadgeClasses[convertPriority(Number(job.priority))]}>{convertPriority(Number(job.priority))}</span>
                 <span className="font-mono text-xs text-textMuted w-20 text-right">
                   {new Date(job.created_at).toLocaleTimeString()}
                 </span>

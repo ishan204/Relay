@@ -1,10 +1,10 @@
 import {client} from './db.ts'
 import { JobStatus } from '../../shared/src/types.ts'
 import type { Request, Response } from 'express'
-export async function enqueueJob(type: string, payload: unknown, namespace:string) {
+export async function enqueueJob(type: string, payload: unknown, namespace:string, priority: number, max_attempts?: number ) {
     const status = JobStatus.PENDING
-    const qry  = 'INSERT INTO JOBS(type, status, payload, namespace) VALUES ($1, $2, $3, $4) RETURNING *'
-    const res = await client.query(qry, [type, status, payload, namespace])
+    const qry  = 'INSERT INTO JOBS(type, status, payload, namespace, priority) VALUES ($1, $2, $3, $4, $5) RETURNING *'
+    const res = await client.query(qry, [type, status, payload, namespace, priority])
     console.log("Job added to queue.")
     return res.rows[0]
 }
@@ -18,7 +18,7 @@ export async function getNextJob(namespace: string) {
 
 export async function getAllJobs(req: Request, res:Response){
     try{
-        const qry = 'SELECT * FROM jobs;'
+        const qry = 'SELECT * FROM jobs order by created_at desc;'
         const result = await client.query(qry)
         return res.json(result.rows)
     }catch(err){

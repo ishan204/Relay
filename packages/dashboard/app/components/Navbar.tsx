@@ -11,10 +11,10 @@ export function Navbar({ wsState, activeWorkers }: NavbarProps) {
     <nav className="h-14 bg-surface border-b border-border px-6 flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-processing to-pending flex items-center justify-center">
-            <Layers className="w-4 h-4 text-background" />
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+            <img src='/relay.svg' className='invert'></img>
           </div>
-          <span className="font-syne font-semibold text-lg text-textPrimary">JobQueue</span>
+          <span className="font-syne font-semibold text-lg text-textPrimary">Relay</span>
         </div>
         <span className="text-textSecondary text-sm font-mono ml-2">Monitor</span>
       </div>

@@ -6,8 +6,8 @@ interface JobDetailPanelProps {
 }
 
 const statusBadgeClasses: Record<JobStatus, string> = {
-  PENDING: 'status-badge status-badge-pending text-pending text-sm',
-  RUNNING: 'status-badge status-badge-processing text-running text-sm',
+  PENDING: 'status-badge status-badge-pending text-pendingLight text-xs w-20 rounded-xl border-pending border-1 p-1 font-normal text-center ',
+  RUNNING: 'status-badge status-badge-processing text-runningLight   text-xs w-20 rounded-xl border-running border-1 p-1 font-normal text-center',
   COMPLETED: 'status-badge status-badge-completed border-completed w-20 text-completedLight rounded-xl border-1 p-1 font-normal text-xs',
   FAILED: 'status-badge status-badge-failed border-failed border-1 w-20 text-center p-1 rounded-xl text-flight text-xs font-medium',
   DEAD: 'status-badge status-badge-deadLetter text-deadLetter text-sm',
@@ -28,6 +28,35 @@ const statusDotColors: Record<JobStatus, string> = {
   FAILED: 'bg-failed',
   DEAD: 'bg-deadLetter',
 };
+
+const priorityBadgeClasses: Record<string, string> = {
+  critical:
+    'bg-red-800 text-white text-xs font-semibold w-fit px-3 py-1 rounded-full shadow-lg shadow-red-600/30',
+
+  medium:
+    'bg-violet-900 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md shadow-violet-500/20 w-fit',
+
+  high:
+    'bg-yellow-500 text-black text-xs font-semibold px-3 py-1 rounded-full shadow-md shadow-yellow-500/20 w-fit',
+
+  low:
+    'bg-sky-900 text-white text-xs font-semibold px-3 py-1 rounded-full w-fit',
+};
+
+function convertPriority(priority: number){
+  switch(priority){
+     case 0:
+        return "low"
+     case 1:
+      return "medium"
+    case 2:
+      return "high"
+    case 3: 
+      return "critical"
+    default:
+      return "low"
+  }
+}
 
 function formatTimestamp(isoString: string): string {
   const date = new Date(isoString);
@@ -81,7 +110,7 @@ export function JobDetailPanel({ job }: JobDetailPanelProps) {
             </div>
             <div className="bg-surfaceHover rounded px-3 py-2">
               <div className="text-xs text-textMuted mb-1">Priority</div>
-              <div className="text-sm font-mono text-textPrimary">{job.priority}</div>
+              <div className={priorityBadgeClasses[convertPriority(Number(job.priority))]}>{convertPriority(Number(job.priority))}</div>
             </div>
             <div className="bg-surfaceHover rounded px-3 py-2">
               <div className="text-xs text-textMuted mb-1">Worker ID</div>
@@ -92,15 +121,22 @@ export function JobDetailPanel({ job }: JobDetailPanelProps) {
             <div className="bg-surfaceHover rounded px-3 py-2">
               <div className="text-xs text-textMuted mb-1">Attempt</div>
               <div className="text-sm font-mono text-textPrimary">
-                {job.attempts} / {job.maxAttempts}
+                {job.attempts} / {job.max_attempts}
               </div>
             </div>
-            <div className="bg-surfaceHover rounded px-3 py-2 col-span-2">
+            <div className="bg-surfaceHover rounded px-3 py-2">
+              <div className="text-xs text-textMuted mb-1">Namespace</div>
+              <div className="text-sm font-mono text-textPrimary">
+                {job.namespace}
+              </div>
+            </div>
+            <div className="bg-surfaceHover rounded px-3 py-2">
               <div className="text-xs text-textMuted mb-1">Created</div>
               <div className="text-sm font-mono text-textPrimary">
                 {formatTimestamp(job.created_at)}
               </div>
             </div>
+            
           </div>
         </div>
 

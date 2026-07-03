@@ -9,7 +9,9 @@
   --color-borderLight: #3A3A48;
 
   --color-pending: #4A6FA5;
+  --color-pendingLight: #72adff;
   --color-running: #C8A84B;
+  --color-runningLight: #ffd666;
   --color-completed: #3D9A6F;
   --color-completedLight: #5dfc77;
   --color-failed: #C25B5B;
@@ -18,7 +20,7 @@
 
   --color-textPrimary: #F5F5F7;
   --color-textSecondary: #A0A0B0;
-  --color-textMuted: #6B6B7B;
+  --color-textMuted: #7a7a8c;
 
   /* Fonts */
   --font-syne: "Syne", sans-serif;

@@ -15,7 +15,7 @@ export interface Job {
   payload: Record<string, unknown>;
   priority: JobPriority;
   attempts: number;
-  maxAttempts: number;
+  max_attempts: number;
   next_run_at: Date;
   created_at: string;
   namespace: string;

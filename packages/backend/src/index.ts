@@ -19,10 +19,14 @@ Create table jobs(
 
 async function main() {
     const payload = {
-        message: 'send this email to the user', 
-        userMail: 'ij@gmail.com'
+        message: 'Send preliminary Report', 
+        userMail: 'ij@gmail.com',
+        jobnum: 0
     }
     await client.connect()
+    await enqueueJob("test", payload, 'testSpace', 3)
+    await enqueueJob("test", payload, 'testSpace', 2)
+    await enqueueJob("test", payload, 'testSpace', 1)
     await client.end()
 }
 

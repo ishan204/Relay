@@ -17,6 +17,7 @@ export async function startWorker(namespace: string){
     `[WORKER] Processing job ${job.id}`
 );
             await testHandler(job.payload)
+            await markCompleted(job.id)
             console.log(
     `[WORKER] Completed job ${job.id}`
 );
