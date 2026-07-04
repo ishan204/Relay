@@ -1,5 +1,5 @@
 import { Job, TabFilter } from '@/types/job';
-import {JobStatus} from '../../../shared/src/types'
+import {JobPriority, JobStatus} from '../../../shared/src/types'
 
 interface JobListProps {
   jobs: Job[];
@@ -34,7 +34,7 @@ const statusBadgeClasses: Record<JobStatus, string> = {
     'bg-slate-500/10 border border-slate-500/40 text-slate-300 text-xs font-medium w-24 py-1 rounded-xl text-center',
 };
 
-const priorityBadgeClasses: Record<string, string> = {
+const priorityBadgeClasses: Record<JobPriority, string> = {
   critical:
     'bg-red-800 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg shadow-red-600/30',
 

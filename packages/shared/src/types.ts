@@ -5,3 +5,10 @@ export enum JobStatus{
     FAILED = "FAILED",
     DEAD = "DEAD",
 }
+
+export enum JobPriority{
+    critical = "critical",
+    high = "high",
+    medium = "medium",
+    low = "low"
+}

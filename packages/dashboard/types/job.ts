@@ -1,5 +1,4 @@
-import {JobStatus} from '../../shared/src/types'
-export type JobPriority = 'critical' | 'high' | 'normal' | 'low';
+import {JobStatus, JobPriority} from '../../shared/src/types'
 
 export interface RetryAttempt {
   attemptNumber: number;
