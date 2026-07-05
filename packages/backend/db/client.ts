@@ -1,0 +1,9 @@
+import { Client, Pool } from "pg";
+
+export const client = new Client({
+  host: "localhost",
+  port: 5433,
+  user: "postgres",
+  password: "postgres",
+  database: "relay",
+});

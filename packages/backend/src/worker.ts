@@ -1,8 +1,9 @@
 import { startWorker } from "./worker-engine.ts"
-import {client} from './db.ts'
 async function main(){
-    await client.connect()
-    await startWorker("testSpace")
-    await client.end()
+    const workerCount = Number(process.env.WORKER_COUNT ?? 3)
+
+    for(let i = 1; i <= workerCount; i++){
+        startWorker("testSpace", i+1)
+    }
 }
 main()
