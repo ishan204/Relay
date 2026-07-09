@@ -1,4 +1,4 @@
-import { enqueueJob } from './jobs.ts'
+import { enqueueJob, markFailed } from './jobs.ts'
 
 async function main() {
     const payload = {
@@ -7,15 +7,9 @@ async function main() {
         jobnum: 0
     }
     
-    await enqueueJob("test", payload, 'testSpace', 3)
-    await enqueueJob("test", payload, 'testSpace', 3)
-    await enqueueJob("test", payload, 'testSpace', 2)
-    await enqueueJob("test", payload, 'testSpace', 3)
-    await enqueueJob("test", payload, 'testSpace', 3)
-    await enqueueJob("test", payload, 'testSpace', 3)
-    await enqueueJob("test", payload, 'testSpace', 1)
-    await enqueueJob("test", payload, 'testSpace', 1)
-    await enqueueJob("test", payload, 'testSpace', 1)
+    const res = await markFailed(96, "Intentional Failure")
+    console.log(res)
+
 }
 
 main()

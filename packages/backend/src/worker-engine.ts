@@ -7,15 +7,16 @@ function sleep(ms: number) {
 
 export async function startWorker(namespace: string, id: number){
     while(true){
-        const job = await claimNextJob(namespace);
+        const job = await claimNextJob(id, namespace);
         if(!job){
             await sleep(1000)
             continue
         }
         try{
             console.log(`Worker ${id} started`)
-            await testHandler(job.payload)
-            await markCompleted(job.id)
+            const result = await testHandler(job.payload)
+            const res = await markCompleted(job.id, result)
+            console.log(res)
             console.log(
     `[WORKER] Completed job ${job.id}`
 );

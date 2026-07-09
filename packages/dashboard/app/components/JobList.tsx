@@ -18,10 +18,10 @@ const statusColors: Record<JobStatus, string> = {
 };
 
 const statusBadgeClasses: Record<JobStatus, string> = {
-  PENDING:
+  RUNNING:
     'bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs font-medium w-24 py-1 rounded-xl text-center',
 
-  RUNNING:
+  PENDING:
     'bg-sky-500/10 border border-sky-500/40 text-sky-300 text-xs font-medium w-24 py-1 rounded-xl text-center',
 
   COMPLETED:
@@ -120,7 +120,7 @@ export function JobList({ jobs, selectedJobId, onSelectJob, activeTab, onTabChan
                 <span className="font-mono text-xs text-textMuted w-20 text-right">
                   {new Date(job.created_at).toLocaleTimeString()}
                 </span>
-                <span className={statusBadgeClasses[job.status]}>{job.status}</span>
+                <span className={statusBadgeClasses[job.status === JobStatus.PENDING && job.attempts > 0 ? JobStatus.FAILED :job.status]}>{job.status === JobStatus.PENDING && job.attempts > 0 ? JobStatus.FAILED :job.status}</span>
               </div>
             </div>
           </div>

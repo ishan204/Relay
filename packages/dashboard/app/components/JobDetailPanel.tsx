@@ -1,6 +1,8 @@
 import { FileJson, History, Sparkles, User, Clock, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { Job } from '@/types/job';
 import { JobStatus } from '../../../shared/src/types';
+import { useEffect, useState } from 'react';
+
 interface JobDetailPanelProps {
   job: Job | null;
 }
@@ -79,6 +81,16 @@ function formatDuration(ms: number): string {
 }
 
 export function JobDetailPanel({ job }: JobDetailPanelProps) {
+  const [result, setResult] = useState<Array<Record<string, unknown>>>([])
+  useEffect(() => {
+    async function main(){
+      const res = await fetch(`http://localhost:8080/job/${job?.id}`)
+      const data =await res.json()
+      setResult(data)
+      console.log(result)
+    }
+    main()
+  }, [job])
   if (!job) {
     return (
       <div className="h-full flex items-center justify-center text-textMuted text-sm">
@@ -189,17 +201,17 @@ export function JobDetailPanel({ job }: JobDetailPanelProps) {
           </div>
         )}
 
-        {job.aiOutput && (
-          <div className="p-4">
+        {result.length > 0 && result.map(res => (
+           <div className="p-4">
             <h3 className="text-xs uppercase tracking-wide text-textMuted mb-3 flex items-center gap-2">
               <Sparkles className="w-3 h-3" />
-              AI Analysis
+              Result
             </h3>
             <div className="bg-background rounded border border-border p-3">
-              <p className="text-sm text-textSecondary leading-relaxed">{job.aiOutput}</p>
+              <pre className="text-xs text-textSecondary leading-relaxed">{JSON.stringify(res.result, null, 2)}</pre>
             </div>
           </div>
-        )}
+        )) }
       </div>
     </div>
   );

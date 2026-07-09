@@ -6,14 +6,14 @@ import { JobList } from './components/JobList';
 import { JobDetailPanel } from './components/JobDetailPanel';
 import { Job, Metrics, WebSocketState, TabFilter } from '@/types/job';
 import { mockJobs, generateMockJobs } from './data/mockJobs';
+import { JobStatus } from '../../shared/src/types';
 
 export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>(mockJobs);
   useEffect(() => {
     async function main() {
-      const res = await fetch("http://localhost:8080/jobs")
+      const res = await fetch("http://localhost:8080/job")
       const data = await res.json()
-      console.log(data)
       setJobs(data)
     }
     main()
@@ -24,13 +24,15 @@ export default function Dashboard() {
   const [activeWorkers, setActiveWorkers] = useState(0);
 
   const selectedJob = jobs.find((job) => job.id === selectedJobId) || null;
-
+  const failedJobs = jobs.filter((job) => {
+    job.status === JobStatus.PENDING && job.attempts > 0
+  })
   const calculateMetrics = useCallback((): Metrics => {
     return {
       pending: jobs.filter((j) => j.status === 'PENDING').length,
       processing: jobs.filter((j) => j.status === 'RUNNING').length,
       completed: jobs.filter((j) => j.status === 'COMPLETED').length,
-      failed: jobs.filter((j) => j.status === 'FAILED').length,
+      failed: failedJobs.length,
       deadLetter: jobs.filter((j) => j.status === 'DEAD').length,
     };
   }, [jobs]);

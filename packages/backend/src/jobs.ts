@@ -10,7 +10,7 @@ export async function enqueueJob(type: string, payload: unknown, namespace:strin
     return res.rows[0]
 }
 
-export async function claimNextJob(namespace: string) {
+export async function claimNextJob(workerId:number, namespace: string) {
     const client = await pool.connect()
     try{
         await client.query("BEGIN");
@@ -52,17 +52,43 @@ export async function getAllJobs(req: Request, res:Response){
     }
 }
 
-export async function markCompleted(id: number){
+export async function markCompleted(id: number, result:Record<string, unknown>){
     const status = JobStatus.COMPLETED
     const qry = `UPDATE jobs SET completed_at=NOW(),status=($1) where id=($2) RETURNING *;`
     const res = await pool.query(qry, [status,id])
-    return res.rows[0]
+    const qy = `INSERT INTO job_results(job_id, result, completed_at) VALUES ($1, $2, $3)`
+    const qyres = await pool.query(qy, [res.rows[0].id, result, res.rows[0].completed_at])
+    return qyres.rows[0]
 }
 
 
 export async function markFailed(id:number, error:string){
-    const status = JobStatus.FAILED
-    const qry = `UPDATE jobs SET status=($1), attempts=attempts+1, next_run_at=NOW()+INTERVAL '30 seconds', error=($2) where id=($3) RETURNING *`
-    const res = await pool.query(qry, [status, error, id])
-    return res.rows[0]
+    const status = JobStatus.PENDING
+    const qy = `SELECT attempts, max_attempts from jobs where id=($1)`
+    const result = await pool.query(qy, [id])
+    const {attempts, max_attempts} = result.rows[0]
+    if(attempts === max_attempts){
+
+    }else{
+        const time = Math.min(30*(2^attempts), 600)
+        const qry = `UPDATE jobs SET status=($1), attempts=attempts+1, next_run_at=NOW()+INTERVAL '${time} seconds', error=($2) where id=($3) RETURNING *`
+        const res = await pool.query(qry, [status, error, id])
+        return res.rows[0]
+    }
+}
+
+export async function getJobResult(req: Request, res: Response){
+    try{
+        const {id} = req.params
+        const jobId = Number(id);
+
+        if (!Number.isInteger(jobId)) {
+            return res.status(400).json({ error: "Invalid job id" });
+        }
+        const qry = `SELECT * from job_results where job_id=($1)`
+        const result = await pool.query(qry, [jobId])
+        return res.json(result.rows)
+    }catch(err){
+        console.log(err)
+    }
 }

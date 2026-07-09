@@ -7,7 +7,7 @@ app.use(cors({
 }))
 async function main(){
     console.log('Mounting JobRouter')
-    app.use("/jobs", JobRouter)
+    app.use("/job", JobRouter)
     
     
     
