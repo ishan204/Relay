@@ -5,16 +5,16 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function startWorker(namespace: string, id: number){
+export async function startWorker( id: number){
     while(true){
-        const job = await claimNextJob(id, namespace);
+        const job = await claimNextJob(id);
         if(!job){
             await sleep(1000)
             continue
         }
         try{
             console.log(`Worker ${id} started`)
-            const result = await testHandler(job.payload)
+            const result = await testFailureHandler(job.payload)
             const res = await markCompleted(job.id, result)
             console.log(res)
             console.log(

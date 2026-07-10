@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     error TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     namespace TEXT,
+    started_at TIMESTAMPTZ,
     completed_at TIMESTAMPTZ
 );
 

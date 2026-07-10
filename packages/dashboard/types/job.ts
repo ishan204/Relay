@@ -22,7 +22,7 @@ export interface Job {
   updatedAt: Date;
   started_at: Date;
   completed_at: Date;
-  workerId?: string;
+  worker_id?: string;   
   retryHistory: RetryAttempt[];
   aiOutput?: string;
 }

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import {client} from './src/db.ts'
+import {client} from './db/client.ts'
 
 async function migrate(){
     await client.connect();

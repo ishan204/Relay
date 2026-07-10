@@ -5,6 +5,7 @@ const app = express()
 app.use(cors({
     origin:'http://localhost:3000'
 }))
+app.use(express.json())
 async function main(){
     console.log('Mounting JobRouter')
     app.use("/job", JobRouter)

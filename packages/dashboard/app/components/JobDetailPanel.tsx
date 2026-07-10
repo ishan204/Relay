@@ -82,12 +82,15 @@ function formatDuration(ms: number): string {
 
 export function JobDetailPanel({ job }: JobDetailPanelProps) {
   const [result, setResult] = useState<Array<Record<string, unknown>>>([])
+  const [badResults, setBadResult] = useState<Array<Record<string, unknown>>>([])
   useEffect(() => {
     async function main(){
       const res = await fetch(`http://localhost:8080/job/${job?.id}`)
       const data =await res.json()
-      setResult(data)
-      console.log(result)
+      console.log("data:", data);
+console.log("isArray:", Array.isArray(data));
+      setResult(data?.filter(res => res.status === "COMPLETED"))
+      setBadResult(data?.filter(res => res.status === "FAILED"))
     }
     main()
   }, [job])
@@ -98,7 +101,6 @@ export function JobDetailPanel({ job }: JobDetailPanelProps) {
       </div>
     );
   }
-
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <div className="p-4 border-b border-border bg-surface">
@@ -127,7 +129,7 @@ export function JobDetailPanel({ job }: JobDetailPanelProps) {
             <div className="bg-surfaceHover rounded px-3 py-2">
               <div className="text-xs text-textMuted mb-1">Worker ID</div>
               <div className="text-sm font-mono text-textPrimary">
-                {job.workerId || 'Unassigned'}
+                {job.worker_id || 'Unassigned'}
               </div>
             </div>
             <div className="bg-surfaceHover rounded px-3 py-2">
@@ -162,37 +164,36 @@ export function JobDetailPanel({ job }: JobDetailPanelProps) {
           </div>
         </div>
 
-        {job?.retryHistory?.length > 0 && (
+        {badResults?.length > 0 && (
           <div className="p-4 border-b border-border">
-            <h3 className="text-xs uppercase tracking-wide text-textMuted mb-3 flex items-center gap-2">
+            <h3 className="text-xs uppercase tracking-wide text-failed mb-3 flex items-center gap-2">
               <History className="w-3 h-3" />
               Retry History
             </h3>
-            <div className="space-y-3">
-              {job.retryHistory.map((attempt, index) => (
-                <div key={attempt.attemptNumber} className="flex gap-3">
+            <div className="space-y-4">
+              {badResults.map((attempt, index) => (
+                <div key={attempt.attempt_number} className="flex gap-3">
                   <div className="flex flex-col items-center">
                     <div
                       className={`w-3 h-3 rounded-full ${statusDotColors.FAILED} ring-2 ring-failed/20`}
                     />
-                    {index < job.retryHistory.length - 1 && (
+                    {index < result.length - 1 && (
                       <div className="w-0.5 h-full bg-border mt-1" />
                     )}
                   </div>
                   <div className="flex-1 pb-4">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-mono text-textMuted">
-                        Attempt {attempt.attemptNumber}
+                        Attempt {attempt.attempt_number}
                       </span>
                       <span className="text-xs text-textMuted">•</span>
                       <span className="text-xs font-mono text-textMuted">
-                        {formatTimestamp(attempt.timestamp)}
+                        {formatTimestamp(attempt.finished_at)}
                       </span>
                     </div>
-                    <div className="text-sm text-failed">{attempt.error}</div>
+                    <div className="text-xs font-medium text-failed ">{attempt.error}</div>
                     <div className="text-xs text-textMuted mt-1">
-                      Worker: <span className="font-mono">{attempt.workerId}</span> • Duration:{' '}
-                      <span className="font-mono">{formatDuration(attempt.duration)}</span>
+                      Worker: <span className="font-mono">{attempt.worker_id}</span> 
                     </div>
                   </div>
                 </div>
@@ -203,12 +204,21 @@ export function JobDetailPanel({ job }: JobDetailPanelProps) {
 
         {result.length > 0 && result.map(res => (
            <div className="p-4">
-            <h3 className="text-xs uppercase tracking-wide text-textMuted mb-3 flex items-center gap-2">
-              <Sparkles className="w-3 h-3" />
+            <h3 className="text-xs uppercase tracking-wide text-green-400 mb-3 flex items-center gap-2">
+              <Sparkles className="w-3 h-3 text-green-400" />
               Result
             </h3>
             <div className="bg-background rounded border border-border p-3">
-              <pre className="text-xs text-textSecondary leading-relaxed">{JSON.stringify(res.result, null, 2)}</pre>
+              <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-mono text-textMuted">
+                        Attempt {res.attempt_number}
+                      </span>
+                      <span className="text-xs text-textMuted">•</span>
+                      <span className="text-xs font-mono text-textMuted">
+                        {formatTimestamp(res.finished_at)}
+                      </span>
+                    </div>
+              <pre className="text-xs text-textSecondary leading-relaxed">{res?.error}</pre>
             </div>
           </div>
         )) }
