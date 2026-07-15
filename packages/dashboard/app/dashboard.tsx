@@ -8,8 +8,11 @@ import { Job, Metrics, WebSocketState, TabFilter } from '@/types/job';
 import { mockJobs, generateMockJobs } from './data/mockJobs';
 import { JobStatus } from '../../shared/src/types';
 
+
 export default function Dashboard() {
   const [jobs, setJobs] = useState<Job[]>(mockJobs);
+  const [wsState, setWsState] = useState<WebSocketState>({ connected: false });
+  let ws: WebSocket;
   useEffect(() => {
     async function main() {
       const res = await fetch("http://localhost:8080/job")
@@ -18,9 +21,24 @@ export default function Dashboard() {
     }
     main()
   }, [])
+   useEffect(() => {
+    ws = new WebSocket("ws://localhost:8080");
+
+    ws.onopen = () => {
+      setWsState({connected: true})
+    };
+
+    ws.onmessage = (event) => {
+      console.log(event.data);
+    };
+
+    return () => {
+      ws.close();
+      setWsState({connected:false})
+    };
+  }, []);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
-  const [wsState, setWsState] = useState<WebSocketState>({ connected: true });
   const [activeWorkers, setActiveWorkers] = useState(0);
 
   const selectedJob = jobs.find((job) => job.id === selectedJobId) || null;

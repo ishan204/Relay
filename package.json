@@ -8,5 +8,8 @@
     "dev:backend": "npm run dev --workspace=backend",
     "dev:dashboard": "npm run dev --workspace=dashboard",
     "build": "npm run build --workspaces"
+  },
+  "dependencies": {
+    "ws": "^8.21.1"
   }
 }
