@@ -3,6 +3,7 @@ import JobRouter from "./routes/jobs.ts";
 import cors from "cors";
 import http from "http";
 import { WebSocketServer } from "ws";
+import subscriber from "./redis/subscriber.ts";
 
 const app = express();
 app.use(
@@ -13,13 +14,17 @@ app.use(
 app.use(express.json());
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
+subscriber.on("message", (channel, message) => {
+  for (const client of wss.clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  }
+});
 wss.on("connection", (ws) => {
   console.log("Client connected");
 
   ws.send(JSON.stringify({ message: "Successfully connected to server" }));
-  ws.on("message", (message) => {
-    console.log("Data: ", message.toString());
-  });
   ws.on("close", () => {
     console.log("client disconnected");
   });

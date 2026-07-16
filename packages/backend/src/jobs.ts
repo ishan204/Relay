@@ -2,6 +2,7 @@ import { pool } from "../db/pool.ts";
 import { JobStatus } from "../../shared/src/types.ts";
 import type { Request, Response } from "express";
 import type { Client, PoolClient } from "pg";
+import publisher from "./redis/publisher.ts";
 export async function enqueueJob(
   type: string,
   payload: unknown,
@@ -28,6 +29,10 @@ export async function enqueueJob(
       "INSERT INTO JOBS(type, status, payload, namespace, priority) VALUES ($1, $2, $3, $4, $5) RETURNING *";
     res = await pool.query(qry, [type, status, payload, namespace, priority]);
   }
+  await publisher.publish(
+    "jobs",
+    JSON.stringify({ type: "JOB_ENQUEUE", job: res.rows[0] }),
+  );
   console.log("Job added to queue.");
   return res.rows[0];
 }
@@ -51,6 +56,7 @@ export async function claimNextJob(workerId: number) {
     }
     const updatedRow = await markRunning(client, res.rows[0].id, workerId);
     await client.query("COMMIT");
+
     return updatedRow;
   } catch (err) {
     await client.query("ROLLBACK");
@@ -69,6 +75,14 @@ export async function markRunning(
   console.log(`[WORKER] Processing job ${job_id}`);
   const qry = `UPDATE jobs SET status=($1),attempts=attempts+1, started_at=NOW(), worker_id=($2) where id=($3) RETURNING *;`;
   const res = await client.query(qry, [status, workerId, job_id]);
+  await publisher.publish(
+    "jobs",
+    JSON.stringify({
+      type: "JOB_UPDATE",
+      status: JobStatus.RUNNING,
+      id: job_id,
+    }),
+  );
   return res.rows[0];
 }
 export async function getAllJobs(req: Request, res: Response) {
@@ -94,6 +108,14 @@ export async function markCompleted(id: number, result: any) {
     status,
     result,
     row.started_at,
+  );
+  await publisher.publish(
+    "jobs",
+    JSON.stringify({
+      type: "JOB_UPDATE",
+      status: JobStatus.COMPLETED,
+      id: id,
+    }),
   );
   return qyres;
 }
@@ -128,10 +150,26 @@ export async function markFailed(id: number, error: string) {
   if (attempts === max_attempts) {
     qry = `UPDATE jobs SET status=($1),error=($2) where id=($3) RETURNING *`;
     res = await pool.query(qry, [JobStatus.DEAD, error, id]);
+    await publisher.publish(
+      "jobs",
+      JSON.stringify({
+        type: "JOB_UPDATE",
+        status: JobStatus.DEAD,
+        id: id,
+      }),
+    );
   } else {
     const time = Math.min(30 * Math.pow(2, attempts - 1), 600);
     qry = `UPDATE jobs SET status=($1), next_run_at=NOW()+INTERVAL '${time} seconds', error=($2) where id=($3) RETURNING *`;
     res = await pool.query(qry, [status, error, id]);
+    await publisher.publish(
+      "jobs",
+      JSON.stringify({
+        type: "JOB_UPDATE",
+        status: JobStatus.FAILED,
+        id: id,
+      }),
+    );
   }
   const row = res.rows[0];
   const qyres = await addJobAttempt(

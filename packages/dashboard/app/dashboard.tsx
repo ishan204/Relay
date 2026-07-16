@@ -29,7 +29,23 @@ export default function Dashboard() {
     };
 
     ws.onmessage = (event) => {
-      console.log(event.data);
+      const res = JSON.parse(event.data)
+      console.log(res)
+      if(res.type === "JOB_UPDATE"){
+        setJobs(prevJobs =>
+          prevJobs.map(job =>
+            job.id === res.id
+            ? {
+              ...job,
+              status: res.status
+            }
+            : job
+          )
+        );
+      }
+      if(res.type === "JOB_ENQUEUE"){
+        setJobs(prev => [res.job, ...prev])
+      }
     };
 
     return () => {

@@ -1,6 +1,6 @@
 export async function testHandler(payload: unknown) {
   console.log("Processing", payload);
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+  await new Promise((resolve) => setTimeout(resolve, 8000));
   const result = "This is the result of the task";
   return result;
 }
